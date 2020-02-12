@@ -43,7 +43,8 @@ def start():
             initialize your snake state here using the
             request's data if necessary.
     """
-    print(json.dumps(data, indent=2))
+    # print(json.dumps(data, indent=2))
+    print('STARTING GAME')
 
     color = "#00FF00"
 
@@ -52,16 +53,23 @@ def start():
 
 @bottle.post('/move')
 def move():
+    # Retrieve data
     data = json.load(bottle.request.body)
     print('DEBUG DUMP', data)
-    print('DEBUG GAME', data['game'])
-    getBodyCoordsFromData(data)
-    """
-    TODO: Using the data from the endpoint request object, your
-            snake AI must choose a direction to move in.
-    """
+
+    # Find walls
+    walls = getBodyCoordsFromData(data)
+
+    # Get random direction
     directions = ['up', 'down', 'left', 'right']
     direction = random.choice(directions)
+    directions.remove(direction)
+    # Ensure it isn't in a wall
+    while(isNextMoveInWall(direction, walls)):
+        if(len(directions) == 0):
+            break
+        direction = random.choice(directions)
+        directions.remove(direction)
 
     return move_response(direction)
 
@@ -74,6 +82,29 @@ def getBodyCoordsFromData(data):
     print('DEBUG COORDS LIST:', coordsList)
     return coordsList
 
+def isNextMoveInWall(direction, walls):
+    currentPos = walls[0]
+    nextMoveCoord = getCoordFromDirection(direction, currentPos)
+    for wall in walls:
+        if(wall[0] == nextMoveCoord[0] and  wall[1] == nextMoveCoord[1]):
+            return True
+    return False
+
+def getCoordFromDirection(direction, currentPos):
+    # Add direction positions to current position
+    moveTuple = getTupleFromDirection(direction)
+    return[ currentPos[0] + moveTuple[0], currentPos[1] + moveTuple[1] ]
+
+def getTupleFromDirection(direction):
+    if( direction == 'up'):
+        return [0,1]
+    elif( direction == 'down'):
+        return [0,-1]
+    elif( direction == 'left'):
+        return [-1,0]
+    else:
+        return [1,0]
+
 @bottle.post('/end')
 def end():
     data = bottle.request.json
@@ -82,7 +113,8 @@ def end():
     TODO: If your snake AI was stateful,
         clean up any stateful objects here.
     """
-    print(json.dumps(data))
+    # print(json.dumps(data))
+    print('GAME OVER')
 
     return end_response()
 
