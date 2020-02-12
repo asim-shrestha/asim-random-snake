@@ -55,7 +55,7 @@ def start():
 def move():
     # Retrieve data
     data = json.load(bottle.request.body)
-    print('DEBUG DUMP', data)
+    # print('DEBUG DUMP', data)
 
     # Find walls
     walls = getBodyCoordsFromData(data)
@@ -90,7 +90,7 @@ def isNextMoveInWall(direction, walls):
     print('DEBUG NEXT MOVE COORD FOR DIRECTION:', direction, ' : ', nextMoveCoord)
     for wall in walls:
         if(wall[0] == nextMoveCoord[0] and  wall[1] == nextMoveCoord[1]):
-            print('DIRECTION IN WALL')
+            print('DIRECTION IN PLAYER WALL')
             return True
     print('DIRECTION IS GUCCI')
     return False
@@ -102,9 +102,9 @@ def getCoordFromDirection(direction, currentPos):
 
 def getTupleFromDirection(direction):
     if( direction == 'up'):
-        return [0,1]
-    elif( direction == 'down'):
         return [0,-1]
+    elif( direction == 'down'):
+        return [0,1]
     elif( direction == 'left'):
         return [-1,0]
     else:
