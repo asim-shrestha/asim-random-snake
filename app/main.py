@@ -54,7 +54,9 @@ def start():
 def move():
     data = bottle.request.json
     print('DEBUG DUMP', json.dumps(data))
-    dataObj = json.loads(data)
+    print('TEST', data)
+    dataObj = json.loads(json.load(data))
+    print('DATA OBJ', dataObj)
     getBodyPositions(dataObj)
 
     """
