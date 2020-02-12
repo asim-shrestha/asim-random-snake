@@ -94,7 +94,7 @@ def isNextMoveInWall(direction, walls):
             return True
     if(isNextMoveOutOfBounds(nextMoveCoord)):
         print('DIRECTION OUT OF BOUNDS')
-            return True
+        return True
     print('DIRECTION IS GUCCI')
     return False
 
