@@ -92,6 +92,9 @@ def isNextMoveInWall(direction, walls):
         if(wall[0] == nextMoveCoord[0] and  wall[1] == nextMoveCoord[1]):
             print('DIRECTION IN PLAYER WALL')
             return True
+    if(isNextMoveOutOfBounds(nextMoveCoord)):
+        print('DIRECTION OUT OF BOUNDS')
+            return True
     print('DIRECTION IS GUCCI')
     return False
 
@@ -109,6 +112,13 @@ def getTupleFromDirection(direction):
         return [-1,0]
     else:
         return [1,0]
+
+def isNextMoveOutOfBounds(nextMoveCoord):
+    if(nextMoveCoord['x'] < 0 or nextMoveCoord['x'] > 10):
+        return True
+    if(nextMoveCoord['y'] < 0 or nextMoveCoord['y'] > 10):
+        return True
+    return False
 
 @bottle.post('/end')
 def end():
