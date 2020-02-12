@@ -65,9 +65,14 @@ def move():
 
     return move_response(direction)
 
-def getBodyPositions(dataObj):
-    body = dataObj['you']['body']
+def getBodyCoordsFromData(data):
+    body = data['you']['body']
+    coordsList = []
+    for coord in body:
+        coordsList.append([coord['x'], coord['y']])
     print('DEBUG BODY:', body)
+    print('DEBUG COORDS LIST:', coordsList)
+    return coordsList
 
 @bottle.post('/end')
 def end():
