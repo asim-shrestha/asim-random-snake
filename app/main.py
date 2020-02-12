@@ -52,12 +52,9 @@ def start():
 
 @bottle.post('/move')
 def move():
-    data = bottle.request.json
-    print('DEBUG DUMP', json.dumps(data))
-    print('TEST', data)
-    dataObj = json.loads(json.load(data))
-    print('DATA OBJ', dataObj)
-    getBodyPositions(dataObj)
+    data = json.loads(bottle.request.body)
+    print('DEBUG DUMP', data)
+    print('DEBUG GAME', data['game'])
 
     """
     TODO: Using the data from the endpoint request object, your
