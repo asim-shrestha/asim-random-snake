@@ -55,7 +55,7 @@ def move():
     data = json.load(bottle.request.body)
     print('DEBUG DUMP', data)
     print('DEBUG GAME', data['game'])
-
+    getBodyCoordsFromData(data)
     """
     TODO: Using the data from the endpoint request object, your
             snake AI must choose a direction to move in.
