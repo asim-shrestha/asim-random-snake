@@ -52,7 +52,7 @@ def start():
 
 @bottle.post('/move')
 def move():
-    data = json.loads(bottle.request.body)
+    data = json.load(bottle.request.body)
     print('DEBUG DUMP', data)
     print('DEBUG GAME', data['game'])
 
