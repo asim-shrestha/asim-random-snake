@@ -87,11 +87,11 @@ def getBodyCoordsFromData(data):
 def isNextMoveInWall(direction, walls):
     currentPos = walls[0]
     nextMoveCoord = getCoordFromDirection(direction, currentPos)
-    print('DEBUG NEXT MOVE COORD' nextMoveCoord)
+    print('DEBUG NEXT MOVE COORD', nextMoveCoord)
     for wall in walls:
         if(wall[0] == nextMoveCoord[0] and  wall[1] == nextMoveCoord[1]):
-            return True
             print('DIRECTION IN WALL')
+            return True
     print('DIRECTION IS GUCCI')
     return False
 
