@@ -43,7 +43,7 @@ def start():
             initialize your snake state here using the
             request's data if necessary.
     """
-    print(json.dumps(data))
+    print(json.dumps(data, indent=2))
 
     color = "#00FF00"
 
@@ -53,18 +53,22 @@ def start():
 @bottle.post('/move')
 def move():
     data = bottle.request.json
+    dataObj = json.loads(data)
 
     """
     TODO: Using the data from the endpoint request object, your
             snake AI must choose a direction to move in.
     """
     print(json.dumps(data))
-
+    getBodyPositions(dataObj)
     directions = ['up', 'down', 'left', 'right']
     direction = random.choice(directions)
 
     return move_response(direction)
 
+def getBodyPositions(dataObj):
+    body = dataObj['you']['body']
+    print('DEBUG BODY:', body)
 
 @bottle.post('/end')
 def end():
@@ -86,6 +90,6 @@ if __name__ == '__main__':
     bottle.run(
         application,
         host=os.getenv('IP', '0.0.0.0'),
-        port=os.getenv('PORT', '8080'),
+        port=os.getenv('PORT', '5000'),
         debug=os.getenv('DEBUG', True)
     )
