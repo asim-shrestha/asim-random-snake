@@ -53,14 +53,14 @@ def start():
 @bottle.post('/move')
 def move():
     data = bottle.request.json
+    print('DEBUG DUMP', json.dumps(data))
     dataObj = json.loads(data)
+    getBodyPositions(dataObj)
 
     """
     TODO: Using the data from the endpoint request object, your
             snake AI must choose a direction to move in.
     """
-    print(json.dumps(data))
-    getBodyPositions(dataObj)
     directions = ['up', 'down', 'left', 'right']
     direction = random.choice(directions)
 
