@@ -114,9 +114,11 @@ def getTupleFromDirection(direction):
         return [1,0]
 
 def isNextMoveOutOfBounds(nextMoveCoord):
-    if(nextMoveCoord['x'] < 0 or nextMoveCoord['x'] > 10):
+    # Test x cord
+    if(nextMoveCoord[0] < 0 or nextMoveCoord[1] > 10):
         return True
-    if(nextMoveCoord['y'] < 0 or nextMoveCoord['y'] > 10):
+    # Test y cord
+    if(nextMoveCoord[0] < 0 or nextMoveCoord[1] > 10):
         return True
     return False
 
