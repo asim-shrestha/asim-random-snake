@@ -86,7 +86,7 @@ def getsnakeCoordsFromData(data):
 
 def getPlayerLocationsFromData(data):
     playerSnake = data['you']['body']
-    playerCoordsList = getCoordsFromSnake(playerSnake)
+    playerCoordsList = getCoordsFromSnakeBody(playerSnake)
     return playerCoordsList
 
 def getOpponentsnakeCoordsFromData(data, playerId):
@@ -94,10 +94,11 @@ def getOpponentsnakeCoordsFromData(data, playerId):
     opponentCoordsList = []
     for snake in allSnakeData:
         if(snake['id'] != playerId):
-            opponentCoordsList += getCoordsFromSnake(snake)
+            snakeBody = snake['body']
+            opponentCoordsList += getCoordsFromSnakeBody(snakeBody)
     return opponentCoordsList
 
-def getCoordsFromSnake(snake):
+def getCoordsFromSnakeBody(snake):
     coordsList = []
     for coord in snake:
         coordsList.append([coord['x'], coord['y']])
