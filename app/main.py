@@ -57,15 +57,15 @@ def move():
     data = json.load(bottle.request.body)
     print('DEBUG DUMP', data)
 
-    # Find walls
-    walls = getBodyCoordsFromData(data)
+    # Find snakeCoords
+    snakeCoords = getsnakeCoordsFromData(data)
 
     # Get random direction
     directions = ['up', 'down', 'left', 'right']
     direction = random.choice(directions)
     directions.remove(direction)
-    # Ensure it isn't in a wall
-    while(isNextMoveInWall(direction, walls)):
+    # Ensure it isn't in an obstacle
+    while(isNextMoveACollision(direction, snakeCoords)):
         if(len(directions) == 0):
             print('CHECKED ALL DIRECTIONS')
             break
@@ -75,33 +75,52 @@ def move():
 
     return move_response(direction)
 
-def getBodyCoordsFromData(data):
-    body = data['you']['body']
+def getsnakeCoordsFromData(data):
+    playerId = data['you']['id']
+    snakeCoords = []
+    snakeCoords += getPlayerLocationsFromData(data)
+    print('DEBUG PLAYER SNAKE LIST:', snakeCoords)
+    snakeCoords += getOpponentsnakeCoordsFromData(data, playerId)
+    print('ALL SNAKE LIST:', snakeCoords)
+    return snakeCoords
+
+def getPlayerLocationsFromData(data):
+    playerSnake = data['you']['body']
+    playerCoordsList = getCoordsFromSnake(playerSnake)
+    return playerCoordsList
+
+def getOpponentsnakeCoordsFromData(data, playerId):
+    allSnakeData = data['board']['snakes']
+    opponentCoordsList = []
+    for snake in allSnakeData:
+        if(snake['id'] != playerId):
+            opponentCoordsList += getCoordsFromSnake(snake)
+    return opponentCoordsList
+
+def getCoordsFromSnake(snake):
     coordsList = []
-    for coord in body:
+    for coord in snake:
         coordsList.append([coord['x'], coord['y']])
-    print('DEBUG BODY:', body)
-    print('DEBUG COORDS LIST:', coordsList)
     return coordsList
 
-def isNextMoveInWall(direction, walls):
-    currentPos = walls[0]
-    nextMoveCoord = getCoordFromDirection(direction, currentPos)
+def isNextMoveACollision(direction, snakeCoords):
+    headCoord = snakeCoords[0]
+    nextMoveCoord = getCoordFromDirection(direction, headCoord)
     print('DEBUG NEXT MOVE COORD FOR DIRECTION:', direction, ' : ', nextMoveCoord)
-    for wall in walls:
-        if(wall[0] == nextMoveCoord[0] and  wall[1] == nextMoveCoord[1]):
-            print('DIRECTION IN PLAYER WALL')
+    for coord in snakeCoords:
+        if(coord[0] == nextMoveCoord[0] and coord[1] == nextMoveCoord[1]):
+            print('DIRECTION IN SNAKE')
             return True
     if(isNextMoveOutOfBounds(nextMoveCoord)):
         print('DIRECTION OUT OF BOUNDS')
         return True
-    print('DIRECTION IS GUCCI')
+    print('DIRECTION IS OKAY')
     return False
 
-def getCoordFromDirection(direction, currentPos):
+def getCoordFromDirection(direction, headCoord):
     # Add direction positions to current position
-    moveTuple = getTupleFromDirection(direction)
-    return[ currentPos[0] + moveTuple[0], currentPos[1] + moveTuple[1] ]
+    nextMoveTuple = getTupleFromDirection(direction)
+    return[ headCoord[0] + nextMoveTuple[0], headCoord[1] + nextMoveTuple[1] ]
 
 def getTupleFromDirection(direction):
     if( direction == 'up'):
