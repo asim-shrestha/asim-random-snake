@@ -55,7 +55,7 @@ def start():
 def move():
     # Retrieve data
     data = json.load(bottle.request.body)
-    # print('DEBUG DUMP', data)
+    print('DEBUG DUMP', data)
 
     # Find walls
     walls = getBodyCoordsFromData(data)
