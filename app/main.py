@@ -80,25 +80,25 @@ def move():
 def getsnakeCoordsFromData(data):
     playerId = data['you']['id']
     snakeCoords = []
-    snakeCoords += getPlayerLocationsFromData(data)
+    snakeCoords += getPlayerCoordsFromData(data)
     print('DEBUG PLAYER SNAKE LIST:', snakeCoords)
     snakeCoords += getOpponentsnakeCoordsFromData(data, playerId)
     print('ALL SNAKE LIST:', snakeCoords)
     return snakeCoords
 
-def getPlayerLocationsFromData(data):
+def getPlayerCoordsFromData(data):
     playerSnake = data['you']['body']
-    playerCoordsList = getCoordsFromSnakeBody(playerSnake)
-    return playerCoordsList
+    playerCoords = getCoordsFromSnakeBody(playerSnake)
+    return playerCoords
 
 def getOpponentsnakeCoordsFromData(data, playerId):
     allSnakeData = data['board']['snakes']
-    opponentCoordsList = []
+    opponentCoords = []
     for snake in allSnakeData:
         if(snake['id'] != playerId):
             snakeBody = snake['body']
-            opponentCoordsList += getCoordsFromSnakeBody(snakeBody)
-    return opponentCoordsList
+            opponentCoords += getCoordsFromSnakeBody(snakeBody)
+    return opponentCoords
 
 def getCoordsFromSnakeBody(snake):
     coordsList = []
@@ -108,7 +108,7 @@ def getCoordsFromSnakeBody(snake):
 
 def isNextMoveACollision(direction, snakeCoords):
     headCoord = snakeCoords[0]
-    nextMoveCoord = getCoordFromDirection(direction, headCoord)
+    nextMoveCoord = getNextMoveCoord(direction, headCoord)
     print('DEBUG NEXT MOVE COORD FOR DIRECTION:', direction, ' : ', nextMoveCoord)
     for coord in snakeCoords:
         if(coord[0] == nextMoveCoord[0] and coord[1] == nextMoveCoord[1]):
@@ -120,7 +120,7 @@ def isNextMoveACollision(direction, snakeCoords):
     print('DIRECTION IS OKAY')
     return False
 
-def getCoordFromDirection(direction, headCoord):
+def getNextMoveCoord(direction, headCoord):
     # Add direction positions to current position
     nextMoveTuple = getTupleFromDirection(direction)
     return[ headCoord[0] + nextMoveTuple[0], headCoord[1] + nextMoveTuple[1] ]
