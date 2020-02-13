@@ -3,6 +3,7 @@ import os
 import random
 import bottle
 
+
 from api import ping_response, start_response, move_response, end_response
 
 
@@ -45,11 +46,12 @@ def start():
     """
     # print(json.dumps(data, indent=2))
     print('STARTING GAME')
+    snakeColour = getRandomColour
+    
+    return start_response(snakeColour)
 
-    color = "#00FF00"
-
-    return start_response(color)
-
+def getRandomColour():
+    return ("%06x" % random.randint(0, 0xFFFFFF))
 
 @bottle.post('/move')
 def move():
