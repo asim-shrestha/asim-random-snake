@@ -5,8 +5,8 @@ class SnakeBoard:
     def __init__(self, data):
         self.width = data['board']['width']
         self.height = data['board']['height']
-        self.playerSnake = Snake(data['you'])
         self.enemySnakes = self.getEnemySnakes(data['board']['snakes'])
+        self.playerSnake = self.enemySnakes[0]
         self.foodCoords = serializeCoordsFromCoordList(data['board']['food'])
 
     def getEnemySnakes(self, snakeData):
