@@ -94,9 +94,6 @@ def isNextDirectionACollision(direction, snakeBoard):
     if(snakeBoard.isNextMoveOutOfBounds(nextMoveCoord)):
         print('DIRECTION OUT OF BOUNDS')
         return True
-    else:
-        print('NOT OUT OF BOUNDS')
-        print(snakeBoard)
     print('DIRECTION IS OKAY')
     return False
 
