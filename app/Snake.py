@@ -5,7 +5,6 @@ class Snake:
         self.id = snake['id']
         self.health = snake['health']
         self.coords = serializeCoordsFromCoordList(snake['body'])
-        self.head = self.coords[0]
         self.length = len(self.coords)
     
     def getHead(self):
