@@ -29,7 +29,7 @@ class SnakeBoard:
     def isNextMoveInAnySnake(self, nextMoveCoord):
         if(self.isNextMoveInSnake(nextMoveCoord, self.playerSnake)):
             print("COLLIDED WITH SELF")
-            return 
+            return True
 
         for snake in self.enemySnakes:
             if(self.isNextMoveInSnake(nextMoveCoord, snake)):
