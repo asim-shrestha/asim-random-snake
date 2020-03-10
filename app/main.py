@@ -3,7 +3,9 @@ import os
 import random
 import bottle
 
-
+from Snake import Snake
+from SnakeBoard import SnakeBoard
+from SerializationUtils import getTupleFromDirection
 from api import ping_response, start_response, move_response, end_response
 
 
@@ -57,91 +59,41 @@ def getRandomColour():
 def move():
     # Retrieve data
     data = json.load(bottle.request.body)
-    print('DEBUG DUMP', data)
+    # print('DEBUG DUMP', data)
 
-    # Find snakeCoords
-    snakeCoords = getsnakeCoordsFromData(data)
+    snakeBoard = SnakeBoard(data)
+    direction = getNextMove(snakeBoard)
+    return move_response(direction)
 
-    # Get random direction
-    directions = ['up', 'down', 'left', 'right']
-    direction = random.choice(directions)
-    directions.remove(direction)
-    # Ensure it isn't in an obstacle
-    while(isNextMoveACollision(direction, snakeCoords)):
-        if(len(directions) == 0):
+def getNextMove(snakeBoard):
+    availableDirections = getDirections()
+    direction = getRandomAvailableDirection(availableDirections)
+    while(isNextDirectionACollision(direction, snakeBoard)):
+        if(len(availableDirections) == 0):
             print('CHECKED ALL DIRECTIONS')
             break
         print('GETTING ANOTHER DIRECTION')
-        direction = random.choice(directions)
-        directions.remove(direction)
+        direction = getRandomAvailableDirection(availableDirections)
+    return direction
 
-    return move_response(direction)
+def getDirections():
+    return ['up', 'down', 'left', 'right']
 
-def getsnakeCoordsFromData(data):
-    playerId = data['you']['id']
-    snakeCoords = []
-    snakeCoords += getPlayerCoordsFromData(data)
-    print('DEBUG PLAYER SNAKE LIST:', snakeCoords)
-    snakeCoords += getOpponentsnakeCoordsFromData(data, playerId)
-    print('ALL SNAKE LIST:', snakeCoords)
-    return snakeCoords
+def getRandomAvailableDirection(availableDirections):
+    nextDirection = random.choice(availableDirections)
+    availableDirections.remove(nextDirection)
+    return nextDirection
 
-def getPlayerCoordsFromData(data):
-    playerSnake = data['you']['body']
-    playerCoords = getCoordsFromSnakeBody(playerSnake)
-    return playerCoords
-
-def getOpponentsnakeCoordsFromData(data, playerId):
-    allSnakeData = data['board']['snakes']
-    opponentCoords = []
-    for snake in allSnakeData:
-        if(snake['id'] != playerId):
-            snakeBody = snake['body']
-            opponentCoords += getCoordsFromSnakeBody(snakeBody)
-    return opponentCoords
-
-def getCoordsFromSnakeBody(snake):
-    coordsList = []
-    for coord in snake:
-        coordsList.append([coord['x'], coord['y']])
-    return coordsList
-
-def isNextMoveACollision(direction, snakeCoords):
-    headCoord = snakeCoords[0]
-    nextMoveCoord = getNextMoveCoord(direction, headCoord)
+def isNextDirectionACollision(direction, snakeBoard):
+    nextMoveCoord = getTupleFromDirection(direction)
     print('DEBUG NEXT MOVE COORD FOR DIRECTION:', direction, ' : ', nextMoveCoord)
-    for coord in snakeCoords:
-        if(coord[0] == nextMoveCoord[0] and coord[1] == nextMoveCoord[1]):
-            print('DIRECTION IN SNAKE')
-            return True
-    if(isNextMoveOutOfBounds(nextMoveCoord)):
+    if(snakeBoard.isNextMoveInSnake(nextMoveCoord)):
+        print('DIRECTION COLLIDES WITH A SNAKE')#
+        return True
+    if(snakeBoard.isNextMoveOutOfBounds(nextMoveCoord)):
         print('DIRECTION OUT OF BOUNDS')
         return True
     print('DIRECTION IS OKAY')
-    return False
-
-def getNextMoveCoord(direction, headCoord):
-    # Add direction positions to current position
-    nextMoveTuple = getTupleFromDirection(direction)
-    return[ headCoord[0] + nextMoveTuple[0], headCoord[1] + nextMoveTuple[1] ]
-
-def getTupleFromDirection(direction):
-    if( direction == 'up'):
-        return [0,-1]
-    elif( direction == 'down'):
-        return [0,1]
-    elif( direction == 'left'):
-        return [-1,0]
-    else:
-        return [1,0]
-
-def isNextMoveOutOfBounds(nextMoveCoord):
-    # Test x cord
-    if(nextMoveCoord[0] < 0 or nextMoveCoord[0] > 10):
-        return True
-    # Test y cord
-    if(nextMoveCoord[1] < 0 or nextMoveCoord[1] > 10):
-        return True
     return False
 
 @bottle.post('/end')

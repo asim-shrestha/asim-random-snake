@@ -1,0 +1,50 @@
+
+
+func(algorithm, availableMoves):
+    #base
+    if out of algorithms:
+        pick a random available move
+    else:
+        filteredMoves = remove invalid moves
+        if no valid moves in filteredMoves:
+            return null
+        else:
+            move = filterMoves(algorithm.removeFirst, availableMoves)
+            if move == null:
+                return random move in filteredMoves
+            else:
+                return move   
+
+
+
+def getFilteredMoves(self, filters, availableMoves):
+    # Base case
+    if(len(filters) == 0):
+        return getAMove(availableMoves)
+    
+    # Filter available moves with first filter
+    filter = filters[0]
+    filteredMoves = filter(availableMoves)
+
+    # Check if filter was too course
+    if(len(filteredMoves == 0)):
+        return null
+    
+    # Recurse
+    remainingFilters = filters[1:]
+    move = filterMoves(remainingFilters, filteredMoves)
+    if(move != null):
+        return move
+    else:
+        return getAMove(filteredMoves)
+
+
+def getAMove(self, moves):
+    return getAMoveWithTheMostEmptySpace(moves)
+
+
+filters:
+    - No walls
+    - No snake bodies
+    - Not a deadend 
+    - Not a position where a bigger snake head could be
