@@ -85,7 +85,8 @@ def getRandomAvailableDirection(availableDirections):
     return nextDirection
 
 def isNextDirectionACollision(direction, snakeBoard):
-    nextMoveCoord = getTupleFromDirection(direction)
+    nextDirectionCoord = getTupleFromDirection(direction)
+    nextMoveCoord = snakeBoard.playerSnake.getNextPosition(nextDirectionCoord)
     print('DEBUG NEXT MOVE COORD FOR DIRECTION:', direction, ' : ', nextMoveCoord)
     if(snakeBoard.isNextMoveInAnySnake(nextMoveCoord)):
         print('DIRECTION COLLIDES WITH A SNAKE')#

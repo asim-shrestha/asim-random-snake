@@ -9,3 +9,6 @@ class Snake:
     
     def getHead(self):
         return self.coords[0]
+
+    def getNextPosition(self, nextMoveCoord):
+        return [self.getHead()[0] + nextMoveCoord[0], self.getHead()[1] + nextMoveCoord[1]]
