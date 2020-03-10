@@ -14,7 +14,7 @@ class SnakeBoard:
         enemySnakes = []
         for snake in snakeData:
             if(snake['id'] != self.playerSnake.id):
-                enemySnakes += Snake(snake)
+                enemySnakes.append(Snake(snake))
         return enemySnakes
 
     def isNextMoveOutOfBounds(self, nextMoveCoord):
