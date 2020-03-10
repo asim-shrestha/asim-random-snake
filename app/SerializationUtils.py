@@ -1,7 +1,7 @@
 def serializeCoordsFromCoordList(coordsList):
         coords = []
         for coord in coordsList:
-            coords += [coord['x'], coord['y']]
+            coords.append([coord['x'], coord['y']])
         return coords
 
 def getTupleFromDirection(direction):
