@@ -12,7 +12,7 @@ class SnakeBoard:
     def getEnemySnakes(self, snakeData):
         enemySnakes = []
         for snake in snakeData:
-            if(snake['id'] != self.playerSnake.id):
+            if(snake.id != self.playerSnake.id):
                 enemySnakes += Snake(snake)
         return enemySnakes
 
@@ -34,7 +34,7 @@ class SnakeBoard:
         
     def isNextMoveInSnake(self, nextMoveCoord, snake):
         # Skip last coordinant since it will dissapear next turn
-        for snakeCoord in snake[:-1]:
+        for snakeCoord in snake.coords[:-1]:
             if(nextMoveCoord[0] == snakeCoord[0] and nextMoveCoord[1] == snakeCoord[1]):
                 return True
         return False
