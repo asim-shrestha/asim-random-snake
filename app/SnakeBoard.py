@@ -5,14 +5,15 @@ class SnakeBoard:
     def __init__(self, data):
         self.width = data['board']['width']
         self.height = data['board']['height']
+        self.playerSnake = Snake(data['you'])
         self.enemySnakes = self.getEnemySnakes(data['board']['snakes'])
-        self.playerSnake = self.enemySnakes[0]
         self.foodCoords = serializeCoordsFromCoordList(data['board']['food'])
 
     def getEnemySnakes(self, snakeData):
         enemySnakes = []
         for snake in snakeData:
-            enemySnakes += Snake(snake)
+            if(snake['id'] != self.playerSnake.id):
+                enemySnakes += Snake(snake)
         return enemySnakes
 
     def isNextMoveOutOfBounds(self, nextMoveCoord):
@@ -28,6 +29,9 @@ class SnakeBoard:
     def getNextHeadPosition(self, nextMoveCoord):
         print(self.playerSnake.getHead())
         print(self.playerSnake.coords)
+        print(self.enemySnakes.coords)
+        print(self.enemySnakes[0])
+        print(self.enemySnakes[0].coords)
         return [self.playerSnake.getHead()[0] + nextMoveCoord[0], self.playerSnake.getHead()[1] + nextMoveCoord[1]]
 
     def isNextMoveInAnySnake(self, nextMoveCoord):
