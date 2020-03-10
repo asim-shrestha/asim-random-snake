@@ -29,7 +29,6 @@ class SnakeBoard:
     def getNextHeadPosition(self, nextMoveCoord):
         print(self.playerSnake.getHead())
         print(self.playerSnake.coords)
-        print(self.enemySnakes.coords)
         print(self.enemySnakes[0])
         print(self.enemySnakes[0].coords)
         return [self.playerSnake.getHead()[0] + nextMoveCoord[0], self.playerSnake.getHead()[1] + nextMoveCoord[1]]
@@ -37,7 +36,7 @@ class SnakeBoard:
     def isNextMoveInAnySnake(self, nextMoveCoord):
         for snake in self.enemySnakes:
             if(self.isNextMoveInSnake(nextMoveCoord, snake)):
-                print("COLLIDED WITH ENEMY SNAKE")
+                print("COLLIDED WITH SNAKE")
                 return True
         return False
         
