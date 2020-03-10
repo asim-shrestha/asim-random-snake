@@ -19,10 +19,10 @@ class SnakeBoard:
 
     def isNextMoveOutOfBounds(self, nextMoveCoord):
         # Test x cord
-        if(nextMoveCoord[0] < 0 or nextMoveCoord[0] > self.width):
+        if(nextMoveCoord[0] < 0 or nextMoveCoord[0] >= self.width):
             return True
         # Test y cord
-        if(nextMoveCoord[1] < 0 or nextMoveCoord[1] > self.height):
+        if(nextMoveCoord[1] < 0 or nextMoveCoord[1] >= self.height):
             return True
         return False
 
