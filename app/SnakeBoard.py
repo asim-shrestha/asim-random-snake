@@ -27,7 +27,9 @@ class SnakeBoard:
         return False
     
     def getNextHeadPosition(self, nextMoveCoord):
-        return [self.playerSnake.head[0] + nextMoveCoord[0], self.playerSnake.head[1] + nextMoveCoord[1]]
+        print(self.playerSnake.getHead())
+        print(self.playerSnake.coords)
+        return [self.playerSnake.getHead()[0] + nextMoveCoord[0], self.playerSnake.getHead()[1] + nextMoveCoord[1]]
 
     def isNextMoveInAnySnake(self, nextMoveCoord):
         for snake in self.enemySnakes:
