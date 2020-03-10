@@ -18,12 +18,16 @@ class SnakeBoard:
 
     def isNextMoveOutOfBounds(self, nextMoveCoord):
         # Test x cord
-        if(nextMoveCoord[0] < 0 or nextMoveCoord[0] > self.width):
+        nextHeadPosition = self.getNextHeadPosition(nextMoveCoord)
+        if(nextHeadPosition[0] < 0 or nextHeadPosition[0] > self.width):
             return True
         # Test y cord
-        if(nextMoveCoord[1] < 0 or nextMoveCoord[1] > self.height):
+        if(nextHeadPosition[1] < 0 or nextHeadPosition[1] > self.height):
             return True
         return False
+    
+    def getNextHeadPosition(self, nextMoveCoord):
+        return [self.playerSnake.head[0] + nextMoveCoord[0], self.playerSnake.head[1] + nextMoveCoord[1]]
 
     def isNextMoveInAnySnake(self, nextMoveCoord):
         for snake in self.enemySnakes:
