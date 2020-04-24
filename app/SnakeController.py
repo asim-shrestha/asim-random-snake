@@ -55,11 +55,12 @@ def getSmallerHeadPerimeterWeight(nextMoveCoord, snakeBoard):
 # We want to step in these spots if we are the only 2 snakes left, otherwise avoid it
 # Do not try to get a tie when you 
 def getEqualHeadPermiterWeight(nextMoveCoord, snakeBoard):
-	if snakeBoard.playerSnake.length < SIZE_REQUIRED_FOR_TIE_WEIGHTS:
-		return 0
 	if (snakeBoard.equalHeadPerimeterCoords.count(nextMoveCoord) > 0):
 		if len(snakeBoard.enemySnakes) == 1:
-			return HEAD_PERIMETER_WEIGHT
+			if snakeBoard.playerSnake.length < SIZE_REQUIRED_FOR_TIE_WEIGHTS:
+				return 0
+			else:
+				return HEAD_PERIMETER_WEIGHT
 		else:
 			return HEAD_PERIMETER_WEIGHT * -1
 	else:
@@ -114,6 +115,11 @@ def getHighestWeightedMoveCoord(availableMoveCoords, weightList):
 
 def getRandomListValue(choicesList):
 	return random.choice(choicesList)
+
+# def preform(coord, snakeBoard):
+# 	availableCoords[]
+# 	availableCoords.append(coord)
+# 	checkCoords[]
 
 def isDirectionTupleACollision(directionTuple, snakeBoard):
 	nextMoveCoord = snakeBoard.playerSnake.getNextPosition(directionTuple)
