@@ -43,17 +43,21 @@ def getBestDirectionTuple(availableDirectionTuples, snakeBoard):
 	weightList = [0] * len(availableDirectionTuples)
 	for i in range(len(availableDirectionTuples)):
 		nextMoveCoord = snakeBoard.playerSnake.getNextPosition(availableDirectionTuples[i])
-		weightList[i] += getSmallerHeadPerimeterWeight(nextMoveCoord, snakeBoard)
-		weightList[i] += getEqualHeadPermiterWeight(nextMoveCoord, snakeBoard)
-		weightList[i] += getBiggerHeadPerimeterWeight(nextMoveCoord, snakeBoard)
-		weightList[i] += getStarvationWeight(nextMoveCoord, snakeBoard)
-		weightList[i] += getBFSWeight(nextMoveCoord, snakeBoard)
-		# TODO weight for 1 space trapping or free areas
-		# TODO weight for closer to food if health is low
-
+		weightList[i] = getNextMoveCoordWeight(nextMoveCoord, snakeBoard)
 	print('Available Directions:    ', [getDirectionFromTuple(x) for x in availableDirectionTuples])
 	print('Weights:                 ', weightList)
 	return getHighestWeightedMoveCoord(availableDirectionTuples, weightList)
+
+def getNextMoveCoordWeight(nextMoveCoord, snakeBoard):
+	weight = 0
+	weight += getSmallerHeadPerimeterWeight(nextMoveCoord, snakeBoard)
+	weight += getEqualHeadPermiterWeight(nextMoveCoord, snakeBoard)
+	weight += getBiggerHeadPerimeterWeight(nextMoveCoord, snakeBoard)
+	weight += getStarvationWeight(nextMoveCoord, snakeBoard)
+	weight += getBFSWeight(nextMoveCoord, snakeBoard)
+	# TODO weight for 1 space trapping or free areas
+	# TODO weight for closer to food if health is low
+	return weight
 
 def getSmallerHeadPerimeterWeight(nextMoveCoord, snakeBoard):
 	return snakeBoard.smallerHeadPerimeterCoords.count(nextMoveCoord) * SMALLER_HEAD_PERIMETER_WEIGHT
@@ -150,8 +154,6 @@ def BFS(cordsToCheckPerimeters, checkedCoords, availableCoords, snakeBoard):
 	return BFS(cordsToCheckPerimeters, checkedCoords, availableCoords, snakeBoard)
 	
 		 
-
-
 def isDirectionTupleACollision(directionTuple, snakeBoard):
 	nextMoveCoord = snakeBoard.playerSnake.getNextPosition(directionTuple)
 	return isNextMoveCoordACollision(nextMoveCoord, snakeBoard)
