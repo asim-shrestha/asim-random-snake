@@ -12,7 +12,8 @@ def getNextMove(snakeBoard):
 		directionTuple = getBestDirectionTuple(availableDirectionTuples, snakeBoard)
 	else:
 		directionTuple = getRandomListValue(allDirectionTuples)
-	print('Next move:', getDirectionFromTuple(directionTuple))
+	print('Next move:', getDirectionFromTuple(directionTuple), 'coord:' snakeBoard.playerSnake.getNextPosition(directionTuple))
+	getLocalNeighbourhood(snakeBoard.playerSnake.getNextPosition(directionTuple))
 	return getDirectionFromTuple(directionTuple)
 
 def getAvailableDirectionTuples(snakeBoard):
@@ -27,18 +28,44 @@ def getBestDirectionTuple(availableDirectionTuples, snakeBoard):
 	weightList = [0] * len(availableDirectionTuples)
 	for i in range(len(availableDirectionTuples)):
 		nextMoveCoord = snakeBoard.playerSnake.getNextPosition(availableDirectionTuples[i])
-		weightList[i] += getBiggerHeadPerimeterWeight(nextMoveCoord, snakeBoard)
 		weightList[i] += getSmallerHeadPerimeterWeight(nextMoveCoord, snakeBoard)
+		weightList[i] += getEqualHeadPermiterWeight(nextMoveCoord, snakeBoard)
+		weightList[i] += getBiggerHeadPerimeterWeight(nextMoveCoord, snakeBoard)
+		# TODO avoid head to head if tie more than 2 snakes in game
+		# TODO weight for 1 space trapping or free areas
+		# TODO weight for closer to food if health is low
 
 	print('Available Directions:    ', [getDirectionFromTuple(x) for x in availableDirectionTuples])
 	print('Weights:                 ', weightList)
 	return getHighestWeightedMoveCoord(availableDirectionTuples, weightList)
 
+def getSmallerHeadPerimeterWeight(nextMoveCoord, snakeBoard):
+	return snakeBoard.smallerHeadPerimeterCoords.count(nextMoveCoord) * 1
+
+# Check if the coordinant is in the head perimeter of a snake of equal size
+# We want to step in these spots if we are the only 2 snakes left, otherwise avoid it
+def getEqualHeadPermiterWeight(nextMoveCoord, snakeBoard):
+	if (snakeBoard.equalHeadPerimeterCoords.count(nextMoveCoord) > 0):
+		if len(snakeBoard.enemySnakes) == 1:
+			return 1
+		else:
+			return -1
+	else:
+		return 0
+
 def getBiggerHeadPerimeterWeight(nextMoveCoord, snakeBoard):
 	return snakeBoard.biggerHeadPerimeterCoords.count(nextMoveCoord) * -1
 
-def getSmallerHeadPerimeterWeight(nextMoveCoord, snakeBoard):
-	return snakeBoard.smallerHeadPerimeterCoords.count(nextMoveCoord) * 1
+
+def getLocalNeighbourhood(coord):
+	NEIGHBOURHOOD_SIZE = 5
+	BOUNDARY = int(NEIGHBOURHOOD_SIZE / 2)  # Gives us the floor
+	localNeighbourhoodCoords = []
+	for i in range(BOUNDARY * -1, BOUNDARY + 1):
+		for j in range(BOUNDARY * -1, BOUNDARY + 1):
+			localNeighbourhoodCoords.append([coord[0] + i, coord[1] + j])
+	print('Debug local neighbourhood:', localNeighbourhoodCoords)
+	return localNeighbourhoodCoords
 
 def getHighestWeightedMoveCoord(availableMoveCoords, weightList):
 	# Get the index with the highest weight
@@ -57,7 +84,6 @@ def getRandomListValue(choicesList):
 
 def isDirectionTupleACollision(directionTuple, snakeBoard):
 	nextMoveCoord = snakeBoard.playerSnake.getNextPosition(directionTuple)
-	print('Next move coord for direction:', getDirectionFromTuple(directionTuple), ' : ', nextMoveCoord)
 	if(snakeBoard.isNextMoveInAnySnake(nextMoveCoord)):
 		print(getDirectionFromTuple(directionTuple), 'collides with a snake!')#
 		return True
