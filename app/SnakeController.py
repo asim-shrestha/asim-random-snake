@@ -1,51 +1,65 @@
 import random
-from SerializationUtils import getTupleFromDirection
+from SerializationUtils import getDirectionFromTuple
 
-def getAllDirections():
-    return ['up', 'down', 'left', 'right']
-    
+def getDirectionTuples():
+	# Up. down, left, right
+	return [[0,-1],[0,1],[-1,0],[1,0]]
+	
 def getNextMove(snakeBoard):
-    allDirections = getAllDirections()
-    availableDirections = getAvailableDirections(snakeBoard)
-    if(len(availableDirections) > 0):
-        direction = getBestDirection(availableDirections, snakeBoard)
-    else:
-        getRandomDirection(allDirections)
-    print('Next move:', direction)
-    return direction
+	allDirectionTuples = getDirectionTuples()
+	availableDirectionTuples = getAvailableDirectionTuples(snakeBoard)
+	if(len(availableDirectionTuples) > 0):
+		directionTuple = getBestDirectionTuple(availableDirectionTuples, snakeBoard)
+	else:
+		getRandomListValue(allDirectionTuples)
+	print('Next move:', getDirectionFromTuple(directionTuple))
+	return getDirectionFromTuple(directionTuple)
 
-def getAvailableDirections(snakeBoard):
-    allDirections = getAllDirections()
-    availableDirections = []
-    for direction in allDirections:
-        if isNextDirectionACollision(direction, snakeBoard) == False:
-            availableDirections.append(direction)
-    return availableDirections
+def getAvailableDirectionTuples(snakeBoard):
+	allDirectionTuples = getDirectionTuples()
+	availableDirectionTuples = []
+	for directionTuple in allDirectionTuples:
+		if isDirectionTupleACollision(directionTuple, snakeBoard) == False:
+			availableDirectionTuples.append(directionTuple)
+	return availableDirectionTuples
 
-def getBestDirection(availableDirections, snakeBoard):
-    weightList = [0] * len(availableDirections)
-    print('Available Directions:    ', availableDirections)
-    print('Weights:                 ', weightList)
-    return getHighestWeightedDirection(availableDirections, weightList)
+def getBestDirectionTuple(availableDirectionTuples, snakeBoard):
+	weightList = [0] * len(availableDirectionTuples)
+	for i in range(len(availableDirectionTuples)):
+		nextMoveCoord = snakeBoard.playerSnake.getNextPosition(availableDirectionTuples[i])
+		weightList[i] += getBiggerHeadPerimeterWeight(nextMoveCoord, snakeBoard.biggerHeadPerimeterCoords)
 
-def getHighestWeightedDirection(availableDirections, weightList):
-    indexOfHighestWeight = weightList.index(max(weightList))
-    return availableDirections[indexOfHighestWeight]
+	print('Available Directions:    ', [getDirectionFromTuple(x) for x in availableDirectionTuples])
+	print('Weights:                 ', weightList)
+	return getHighestWeightedMoveCoord(availableDirectionTuples, weightList)
 
-def getRandomDirection(availableDirections):
-    nextDirection = random.choice(availableDirections)
-    availableDirections.remove(nextDirection)
-    return nextDirection
+def getBiggerHeadPerimeterWeight(nextMoveCoord, biggerHeadPerimeterCoords):
+	print('COUNT of coords', biggerHeadPerimeterCoords.count(nextMoveCoord))
+	return biggerHeadPerimeterCoords.count(nextMoveCoord) * -1
 
-def isNextDirectionACollision(direction, snakeBoard):
-    nextDirectionCoord = getTupleFromDirection(direction)
-    nextMoveCoord = snakeBoard.playerSnake.getNextPosition(nextDirectionCoord)
-    print('DEBUG NEXT MOVE COORD FOR DIRECTION:', direction, ' : ', nextMoveCoord)
-    if(snakeBoard.isNextMoveInAnySnake(nextMoveCoord)):
-        print('DIRECTION COLLIDES WITH A SNAKE')#
-        return True
-    if(snakeBoard.isNextMoveOutOfBounds(nextMoveCoord)):
-        print('DIRECTION OUT OF BOUNDS')
-        return True
-    print('DIRECTION IS OKAY')
-    return False
+def getHighestWeightedMoveCoord(availableMoveCoords, weightList):
+	# Get the index with the highest weight
+	# If there are multiple, one of the options is randomly selected
+	highestWeight = max(weightList)
+	while True:
+		randomIndex = random.randint(0, len(weightList) - 1)
+		if weightList[randomIndex] == highestWeight:
+			indexOfHighestWeight = randomIndex
+			break
+	
+	return availableMoveCoords[indexOfHighestWeight]
+
+def getRandomListValue(choicesList):
+	return random.choice(choicesList)
+
+def isDirectionTupleACollision(directionTuple, snakeBoard):
+	nextMoveCoord = snakeBoard.playerSnake.getNextPosition(directionTuple)
+	print('Next move coord for direction:', getDirectionFromTuple(directionTuple), ' : ', nextMoveCoord)
+	if(snakeBoard.isNextMoveInAnySnake(nextMoveCoord)):
+		print(getDirectionFromTuple(directionTuple), 'collides with a snake!')#
+		return True
+	if(snakeBoard.isNextMoveOutOfBounds(nextMoveCoord)):
+		print(getDirectionFromTuple(directionTuple), 'collides with a wall!')#
+		return True
+	print(getDirectionFromTuple(directionTuple), 'is ok!')#
+	return False
