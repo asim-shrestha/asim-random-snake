@@ -1,5 +1,5 @@
 from Snake import Snake
-from SerializationUtils import serializeCoordsFromCoordList
+from SerializationUtils import serializeCoordsFromCoordList, getCoordPerimeterCoords
 
 class SnakeBoard:
 	def __init__(self, data):
@@ -27,30 +27,24 @@ class SnakeBoard:
 		smallerHeadPerimeterCoords = []
 		for snake in self.enemySnakes:
 			if(snake.length < self.playerSnake.length):
-				smallerHeadPerimeterCoords.extend(self.getCoordPerimeterCoords(snake.coords[0]))
+				smallerHeadPerimeterCoords.extend(getCoordPerimeterCoords(snake.coords[0]))
 		return smallerHeadPerimeterCoords
 
 	def getEqualHeadPerimeterCoords(self):
 		equalHeadPerimeterCoords = []
 		for snake in self.enemySnakes:
 			if snake.length == self.playerSnake.length:
-				equalHeadPerimeterCoords.extend(self.getCoordPerimeterCoords(snake.coords[0]))
+				equalHeadPerimeterCoords.extend(getCoordPerimeterCoords(snake.coords[0]))
 		return equalHeadPerimeterCoords
 
 	def getBiggerHeadPerimeterCoords(self):
 		biggerHeadPerimetersCoords = []
 		for snake in self.enemySnakes:
 			if(snake.length > self.playerSnake.length):
-				biggerHeadPerimetersCoords.extend(self.getCoordPerimeterCoords(snake.coords[0]))
+				biggerHeadPerimetersCoords.extend(getCoordPerimeterCoords(snake.coords[0]))
 		return biggerHeadPerimetersCoords
 
-	def getCoordPerimeterCoords(self, coord):
-		cordPerimeterCoords = []
-		cordPerimeterCoords.append([coord[0], coord[1] - 1]) # Block above the head
-		cordPerimeterCoords.append([coord[0], coord[1] + 1]) # Block below the head
-		cordPerimeterCoords.append([coord[0] - 1, coord[1]]) # Block to the left of head
-		cordPerimeterCoords.append([coord[0] + 1, coord[1]]) # Block to the right of head
-		return cordPerimeterCoords
+
 
 	def isNextMoveOutOfBounds(self, nextMoveCoord):
 		# Test x cord
