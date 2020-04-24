@@ -27,14 +27,18 @@ def getBestDirectionTuple(availableDirectionTuples, snakeBoard):
 	weightList = [0] * len(availableDirectionTuples)
 	for i in range(len(availableDirectionTuples)):
 		nextMoveCoord = snakeBoard.playerSnake.getNextPosition(availableDirectionTuples[i])
-		weightList[i] += getBiggerHeadPerimeterWeight(nextMoveCoord, snakeBoard.biggerHeadPerimeterCoords)
+		weightList[i] += getBiggerHeadPerimeterWeight(nextMoveCoord, snakeBoard)
+		weightList[i] += getSmallerHeadPerimeterWeight(nextMoveCoord, snakeBoard)
 
 	print('Available Directions:    ', [getDirectionFromTuple(x) for x in availableDirectionTuples])
 	print('Weights:                 ', weightList)
 	return getHighestWeightedMoveCoord(availableDirectionTuples, weightList)
 
-def getBiggerHeadPerimeterWeight(nextMoveCoord, biggerHeadPerimeterCoords):
-	return biggerHeadPerimeterCoords.count(nextMoveCoord) * -1
+def getBiggerHeadPerimeterWeight(nextMoveCoord, snakeBoard):
+	return snakeBoard.biggerHeadPerimeterCoords.count(nextMoveCoord) * -1
+
+def getSmallerHeadPerimeterWeight(nextMoveCoord, snakeBoard):
+	return snakeBoard.smallerHeadPerimeterCoords.count(nextMoveCoord) * 1
 
 def getHighestWeightedMoveCoord(availableMoveCoords, weightList):
 	# Get the index with the highest weight

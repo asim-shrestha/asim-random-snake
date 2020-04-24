@@ -7,10 +7,12 @@ class SnakeBoard:
         self.height = data['board']['height']
         self.playerSnake = Snake(data['you'])
         self.enemySnakes = self.getEnemySnakes(data['board']['snakes'])
+        # TODO head perimeters for ties
         self.biggerHeadPerimeterCoords = self.getBiggerHeadPerimeterCoords()
+        self.smallerHeadPerimeterCoords = self.getSmallerHeadPerimeterCoords()
         self.foodCoords = serializeCoordsFromCoordList(data['board']['food'])
         print('Player coords', self.playerSnake.coords)
-        print('Bigger head perimiters', self.biggerHeadPerimeterCoords)
+        print('smaller head perimiters', self.smallerHeadPerimeterCoords)
 
     def getEnemySnakes(self, snakeData):
         enemySnakes = []
@@ -22,7 +24,7 @@ class SnakeBoard:
     def getBiggerHeadPerimeterCoords(self):
         biggerHeadPerimetersCoords = []
         for snake in self.enemySnakes:
-            if(snake.length >= self.playerSnake.length):
+            if(snake.length > self.playerSnake.length):
                 biggerHeadPerimetersCoords.extend(self.getHeadPerimetersCoordsFromSnake(snake))
         return biggerHeadPerimetersCoords
 
