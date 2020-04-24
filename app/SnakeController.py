@@ -1,6 +1,11 @@
 import random
 from SerializationUtils import getDirectionFromTuple
 
+HEAD_PERIMETER_WEIGHT = 3
+FOOD_WEIGHT = 2
+
+TRAPPED_WEIGHT = 10
+
 def getDirectionTuples():
 	# Up. down, left, right
 	return [[0,-1],[0,1],[-1,0],[1,0]]
@@ -12,8 +17,7 @@ def getNextMove(snakeBoard):
 		directionTuple = getBestDirectionTuple(availableDirectionTuples, snakeBoard)
 	else:
 		directionTuple = getRandomListValue(allDirectionTuples)
-	print('Next move:', getDirectionFromTuple(directionTuple), 'coord:' snakeBoard.playerSnake.getNextPosition(directionTuple))
-	getLocalNeighbourhood(snakeBoard.playerSnake.getNextPosition(directionTuple))
+	print('Next move:', getDirectionFromTuple(directionTuple), ',coord:', snakeBoard.playerSnake.getNextPosition(directionTuple))
 	return getDirectionFromTuple(directionTuple)
 
 def getAvailableDirectionTuples(snakeBoard):
@@ -31,7 +35,7 @@ def getBestDirectionTuple(availableDirectionTuples, snakeBoard):
 		weightList[i] += getSmallerHeadPerimeterWeight(nextMoveCoord, snakeBoard)
 		weightList[i] += getEqualHeadPermiterWeight(nextMoveCoord, snakeBoard)
 		weightList[i] += getBiggerHeadPerimeterWeight(nextMoveCoord, snakeBoard)
-		# TODO avoid head to head if tie more than 2 snakes in game
+		weightList[i] += getSmallTrapAvoidanceWeight(nextMoveCoord, snakeBoard)
 		# TODO weight for 1 space trapping or free areas
 		# TODO weight for closer to food if health is low
 
@@ -40,32 +44,43 @@ def getBestDirectionTuple(availableDirectionTuples, snakeBoard):
 	return getHighestWeightedMoveCoord(availableDirectionTuples, weightList)
 
 def getSmallerHeadPerimeterWeight(nextMoveCoord, snakeBoard):
-	return snakeBoard.smallerHeadPerimeterCoords.count(nextMoveCoord) * 1
+	return snakeBoard.smallerHeadPerimeterCoords.count(nextMoveCoord) * HEAD_PERIMETER_WEIGHT
 
 # Check if the coordinant is in the head perimeter of a snake of equal size
 # We want to step in these spots if we are the only 2 snakes left, otherwise avoid it
 def getEqualHeadPermiterWeight(nextMoveCoord, snakeBoard):
 	if (snakeBoard.equalHeadPerimeterCoords.count(nextMoveCoord) > 0):
 		if len(snakeBoard.enemySnakes) == 1:
-			return 1
+			return HEAD_PERIMETER_WEIGHT
 		else:
-			return -1
+			return HEAD_PERIMETER_WEIGHT * -1
 	else:
 		return 0
 
 def getBiggerHeadPerimeterWeight(nextMoveCoord, snakeBoard):
-	return snakeBoard.biggerHeadPerimeterCoords.count(nextMoveCoord) * -1
+	return snakeBoard.biggerHeadPerimeterCoords.count(nextMoveCoord) * HEAD_PERIMETER_WEIGHT * -1
 
+def getSmallTrapAvoidanceWeight(nextMoveCoord, snakeBoard):
+	nextMovePerimeterCoords = snakeBoard.getCoordPerimeterCoords(nextMoveCoord)
+	availableFutureMoves = []
+	for move in nextMovePerimeterCoords:
+		if isNextMoveCoordACollision(move, snakeBoard) == False:
+			availableFutureMoves.append(move)
+	if len(availableFutureMoves) == 0:
+		print(nextMoveCoord, 'WILL BE A TRAP!!!!')
+		return TRAPPED_WEIGHT * -1
+	else:
+		return 0
 
-def getLocalNeighbourhood(coord):
-	NEIGHBOURHOOD_SIZE = 5
-	BOUNDARY = int(NEIGHBOURHOOD_SIZE / 2)  # Gives us the floor
-	localNeighbourhoodCoords = []
-	for i in range(BOUNDARY * -1, BOUNDARY + 1):
-		for j in range(BOUNDARY * -1, BOUNDARY + 1):
-			localNeighbourhoodCoords.append([coord[0] + i, coord[1] + j])
-	print('Debug local neighbourhood:', localNeighbourhoodCoords)
-	return localNeighbourhoodCoords
+def getCollisionNeighboursInBoundary(nextMoveCoord, boundary, snakeBoard):
+	collisionNeighbourCoords = []
+	for i in range(boundary * -1, boundary + 1):
+		for j in range(boundary * -1, boundary + 1):
+			neighbourCoord = [nextMoveCoord[0] + i, nextMoveCoord[1] + j]
+			if isNextMoveCoordACollision(neighbourCoord, snakeBoard):
+				collisionNeighbourCoords.append(neighbourCoord)
+	print('Debug colliding neighbours:', collisionNeighbourCoords)
+	return collisionNeighbourCoords
 
 def getHighestWeightedMoveCoord(availableMoveCoords, weightList):
 	# Get the index with the highest weight
@@ -84,11 +99,14 @@ def getRandomListValue(choicesList):
 
 def isDirectionTupleACollision(directionTuple, snakeBoard):
 	nextMoveCoord = snakeBoard.playerSnake.getNextPosition(directionTuple)
+	return isNextMoveCoordACollision(nextMoveCoord, snakeBoard)
+	
+def isNextMoveCoordACollision(nextMoveCoord, snakeBoard):
 	if(snakeBoard.isNextMoveInAnySnake(nextMoveCoord)):
-		print(getDirectionFromTuple(directionTuple), 'collides with a snake!')#
+		print(nextMoveCoord, 'collides with a snake!')#
 		return True
 	if(snakeBoard.isNextMoveOutOfBounds(nextMoveCoord)):
-		print(getDirectionFromTuple(directionTuple), 'collides with a wall!')#
+		print(nextMoveCoord, 'collides with a wall!')#
 		return True
-	print(getDirectionFromTuple(directionTuple), 'is ok!')#
+	print(nextMoveCoord, 'is ok!')#
 	return False

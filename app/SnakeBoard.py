@@ -27,31 +27,30 @@ class SnakeBoard:
 		smallerHeadPerimeterCoords = []
 		for snake in self.enemySnakes:
 			if(snake.length < self.playerSnake.length):
-				smallerHeadPerimeterCoords.extend(self.getHeadPerimetersCoordsFromSnake(snake))
+				smallerHeadPerimeterCoords.extend(self.getCoordPerimeterCoords(snake.coords[0]))
 		return smallerHeadPerimeterCoords
 
 	def getEqualHeadPerimeterCoords(self):
 		equalHeadPerimeterCoords = []
 		for snake in self.enemySnakes:
 			if snake.length == self.playerSnake.length:
-				equalHeadPerimeterCoords.extend(self.getHeadPerimetersCoordsFromSnake(snake))
+				equalHeadPerimeterCoords.extend(self.getCoordPerimeterCoords(snake.coords[0]))
 		return equalHeadPerimeterCoords
 
 	def getBiggerHeadPerimeterCoords(self):
 		biggerHeadPerimetersCoords = []
 		for snake in self.enemySnakes:
 			if(snake.length > self.playerSnake.length):
-				biggerHeadPerimetersCoords.extend(self.getHeadPerimetersCoordsFromSnake(snake))
+				biggerHeadPerimetersCoords.extend(self.getCoordPerimeterCoords(snake.coords[0]))
 		return biggerHeadPerimetersCoords
 
-	def getHeadPerimetersCoordsFromSnake(self, snake):
-		headPerimeterCoords = []
-		snakeHeadCoord = snake.coords[0]
-		headPerimeterCoords.append([snakeHeadCoord[0], snakeHeadCoord[1] - 1]) # Block above the head
-		headPerimeterCoords.append([snakeHeadCoord[0], snakeHeadCoord[1] + 1]) # Block below the head
-		headPerimeterCoords.append([snakeHeadCoord[0] - 1, snakeHeadCoord[1]]) # Block to the left of head
-		headPerimeterCoords.append([snakeHeadCoord[0] + 1, snakeHeadCoord[1]]) # Block to the right of head
-		return headPerimeterCoords
+	def getCoordPerimeterCoords(self, coord):
+		cordPerimeterCoords = []
+		cordPerimeterCoords.append([coord[0], coord[1] - 1]) # Block above the head
+		cordPerimeterCoords.append([coord[0], coord[1] + 1]) # Block below the head
+		cordPerimeterCoords.append([coord[0] - 1, coord[1]]) # Block to the left of head
+		cordPerimeterCoords.append([coord[0] + 1, coord[1]]) # Block to the right of head
+		return cordPerimeterCoords
 
 	def isNextMoveOutOfBounds(self, nextMoveCoord):
 		# Test x cord
@@ -77,3 +76,18 @@ class SnakeBoard:
 			if(nextMoveCoord[0] == snakeCoord[0] and nextMoveCoord[1] == snakeCoord[1]):
 				return True
 		return False
+
+	def getNumMovesToNearestFood(self, moveCoord):
+		if len(self.foodCoords) == 0:
+			return 0
+		
+		# Loop through each food coord and find the minimum moves to food
+		numMovesToNearestFood = self.getNumMovesToFoodCoord(moveCoord, self.foodCoords[0])
+		for foodCoord in self.foodCoords:
+			numMovesToNearestFood = min(numMovesToNearestFood, self.getNumMovesToFoodCoord(moveCoord, foodCoord))
+		return numMovesToNearestFood
+	
+	def getNumMovesToFoodCoord(self, moveCoord, foodCoord):
+		horizontalMoves = abs(moveCoord[0] - foodCoord[0])
+		verticalMoves = abs(moveCoord[1] - foodCoord[1])
+		return horizontalMoves + verticalMoves
