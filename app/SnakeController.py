@@ -1,21 +1,38 @@
 import random
 from SerializationUtils import getTupleFromDirection
 
-def getDirections():
+def getAllDirections():
     return ['up', 'down', 'left', 'right']
     
 def getNextMove(snakeBoard):
-    availableDirections = getDirections()
-    direction = getRandomAvailableDirection(availableDirections)
-    while(isNextDirectionACollision(direction, snakeBoard)):
-        if(len(availableDirections) == 0):
-            print('CHECKED ALL DIRECTIONS')
-            break
-        print('GETTING ANOTHER DIRECTION')
-        direction = getRandomAvailableDirection(availableDirections)
+    allDirections = getAllDirections()
+    availableDirections = getAvailableDirections(snakeBoard)
+    if(len(availableDirections) > 0):
+        direction = getBestDirection(availableDirections, snakeBoard)
+    else:
+        getRandomDirection(allDirections)
+    print('Next move:', direction)
     return direction
 
-def getRandomAvailableDirection(availableDirections):
+def getAvailableDirections(snakeBoard):
+    allDirections = getAllDirections()
+    availableDirections = []
+    for direction in allDirections:
+        if isNextDirectionACollision(direction, snakeBoard) == False:
+            availableDirections.append(direction)
+    return availableDirections
+
+def getBestDirection(availableDirections, snakeBoard):
+    weightList = [0] * len(availableDirections)
+    print('Available Directions:    ', availableDirections)
+    print('Weights:                 ', weightList)
+    return getHighestWeightedDirection(availableDirections, weightList)
+
+def getHighestWeightedDirection(availableDirections, weightList):
+    indexOfHighestWeight = weightList.index(max(weightList))
+    return availableDirections[indexOfHighestWeight]
+
+def getRandomDirection(availableDirections):
     nextDirection = random.choice(availableDirections)
     availableDirections.remove(nextDirection)
     return nextDirection
