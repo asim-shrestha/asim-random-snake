@@ -1,14 +1,21 @@
 import random
-from SerializationUtils import getDirectionFromTuple
+from SerializationUtils import getDirectionFromTuple, getCoordPerimeterCoords
 
-HEAD_PERIMETER_WEIGHT = 3
+# Weights for heuristics
+SMALLER_HEAD_PERIMETER_WEIGHT = 4
+BIGGER_HEAD_PERIMETER_WEIGHT = 5
 GROWTH_WEIGHT = 2
 TRAPPED_WEIGHT = 10
-
-SIZE_REQUIRED_FOR_TIE_WEIGHTS = 5
-
+ABOVE_POTENTIAL_TURN_REQUIREMENTS_WEIGHT = 1
+BELOW_SNAKE_SIZE_WEIGHT = 5
+SMALLER_THAN_SIZE_REQUIRED_FOR_TIE_WEIGHT = 1
+# Size required for the snake to hunt for a tie
+SIZE_REQUIRED_FOR_TIE = 5
+# To determine if the snake should hunt for food
 STARVING_HEALTH = 45
-STARVATION_LENGTH = 10
+STARVATION_LENGTH = 5
+# For BFS
+POTENTIAL_TURN_REQUIREMENTS = 10
 
 def getDirectionTuples():
 	# Up. down, left, right
@@ -39,8 +46,8 @@ def getBestDirectionTuple(availableDirectionTuples, snakeBoard):
 		weightList[i] += getSmallerHeadPerimeterWeight(nextMoveCoord, snakeBoard)
 		weightList[i] += getEqualHeadPermiterWeight(nextMoveCoord, snakeBoard)
 		weightList[i] += getBiggerHeadPerimeterWeight(nextMoveCoord, snakeBoard)
-		weightList[i] += getSmallTrapAvoidanceWeight(nextMoveCoord, snakeBoard)
 		weightList[i] += getStarvationWeight(nextMoveCoord, snakeBoard)
+		weightList[i] += getBFSWeight(nextMoveCoord, snakeBoard)
 		# TODO weight for 1 space trapping or free areas
 		# TODO weight for closer to food if health is low
 
@@ -49,37 +56,22 @@ def getBestDirectionTuple(availableDirectionTuples, snakeBoard):
 	return getHighestWeightedMoveCoord(availableDirectionTuples, weightList)
 
 def getSmallerHeadPerimeterWeight(nextMoveCoord, snakeBoard):
-	return snakeBoard.smallerHeadPerimeterCoords.count(nextMoveCoord) * HEAD_PERIMETER_WEIGHT
+	return snakeBoard.smallerHeadPerimeterCoords.count(nextMoveCoord) * SMALLER_HEAD_PERIMETER_WEIGHT
 
 # Check if the coordinant is in the head perimeter of a snake of equal size
-# We want to step in these spots if we are the only 2 snakes left, otherwise avoid it
+# We want to avoid ties, DUBS ONLY
 # Do not try to get a tie when you 
 def getEqualHeadPermiterWeight(nextMoveCoord, snakeBoard):
 	if (snakeBoard.equalHeadPerimeterCoords.count(nextMoveCoord) > 0):
 		if len(snakeBoard.enemySnakes) == 1:
-			if snakeBoard.playerSnake.length < SIZE_REQUIRED_FOR_TIE_WEIGHTS:
-				return 0
-			else:
-				return HEAD_PERIMETER_WEIGHT
+			return SMALLER_THAN_SIZE_REQUIRED_FOR_TIE_WEIGHT * -1
 		else:
-			return HEAD_PERIMETER_WEIGHT * -1
+			return BIGGER_HEAD_PERIMETER_WEIGHT * -1
 	else:
 		return 0
 
 def getBiggerHeadPerimeterWeight(nextMoveCoord, snakeBoard):
-	return snakeBoard.biggerHeadPerimeterCoords.count(nextMoveCoord) * HEAD_PERIMETER_WEIGHT * -1
-
-def getSmallTrapAvoidanceWeight(nextMoveCoord, snakeBoard):
-	nextMovePerimeterCoords = snakeBoard.getCoordPerimeterCoords(nextMoveCoord)
-	availableFutureMoves = []
-	for move in nextMovePerimeterCoords:
-		if isNextMoveCoordACollision(move, snakeBoard) == False:
-			availableFutureMoves.append(move)
-	if len(availableFutureMoves) == 0:
-		print(nextMoveCoord, 'WILL BE A TRAP!!!!')
-		return TRAPPED_WEIGHT * -1
-	else:
-		return 0
+	return snakeBoard.biggerHeadPerimeterCoords.count(nextMoveCoord) * BIGGER_HEAD_PERIMETER_WEIGHT * -1
 
 def getStarvationWeight(nextMoveCoord, snakeBoard):
 	# Player isn't starving, no need to prioritize food
@@ -116,10 +108,49 @@ def getHighestWeightedMoveCoord(availableMoveCoords, weightList):
 def getRandomListValue(choicesList):
 	return random.choice(choicesList)
 
-# def preform(coord, snakeBoard):
-# 	availableCoords[]
-# 	availableCoords.append(coord)
-# 	checkCoords[]
+def getBFSWeight(coord, snakeBoard):
+	cordsToCheckPerimeters = []
+	checkedCoords = []
+	availableCoords = []
+	cordsToCheckPerimeters.append(coord)
+	checkedCoords.append(coord)
+	availableCoords.append(coord)
+	potentialTurns = len(BFS(cordsToCheckPerimeters, checkedCoords, availableCoords, snakeBoard))
+	print('Potential turns:', potentialTurns)
+	if(potentialTurns >= POTENTIAL_TURN_REQUIREMENTS):
+		return ABOVE_POTENTIAL_TURN_REQUIREMENTS_WEIGHT
+	if(potentialTurns <= 1):
+		return TRAPPED_WEIGHT * -1
+	if(potentialTurns < snakeBoard.playerSnake.length):
+		return BELOW_SNAKE_SIZE_WEIGHT * -1
+	else:
+		return 0
+
+def BFS(cordsToCheckPerimeters, checkedCoords, availableCoords, snakeBoard):
+	# No possible moves left
+	if len(cordsToCheckPerimeters) == 0:
+		return availableCoords
+	
+	# Check if we've already found a lot of potential turns
+	if len(availableCoords) >= POTENTIAL_TURN_REQUIREMENTS:
+		return availableCoords
+
+	# Get coords we haven't tested yet
+	cordPerimeters = getCoordPerimeterCoords(cordsToCheckPerimeters.pop(0))
+	unCheckedCoords = []
+	unCheckedCoords[:] = [coord for coord in cordPerimeters if coord not in checkedCoords]
+
+	for coord in unCheckedCoords:
+		checkedCoords.append(coord)
+		if isNextMoveCoordACollision(coord, snakeBoard) == False:
+			cordsToCheckPerimeters.append(coord)
+			availableCoords.append(coord)
+	# Test if we've checked already
+	# Add to available 
+	return BFS(cordsToCheckPerimeters, checkedCoords, availableCoords, snakeBoard)
+	
+		 
+
 
 def isDirectionTupleACollision(directionTuple, snakeBoard):
 	nextMoveCoord = snakeBoard.playerSnake.getNextPosition(directionTuple)
@@ -127,10 +158,7 @@ def isDirectionTupleACollision(directionTuple, snakeBoard):
 	
 def isNextMoveCoordACollision(nextMoveCoord, snakeBoard):
 	if(snakeBoard.isNextMoveInAnySnake(nextMoveCoord)):
-		print(nextMoveCoord, 'collides with a snake!')#
 		return True
 	if(snakeBoard.isNextMoveOutOfBounds(nextMoveCoord)):
-		print(nextMoveCoord, 'collides with a wall!')#
 		return True
-	print(nextMoveCoord, 'is ok!')#
 	return False
