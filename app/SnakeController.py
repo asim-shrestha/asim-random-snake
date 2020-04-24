@@ -11,7 +11,7 @@ def getNextMove(snakeBoard):
 	if(len(availableDirectionTuples) > 0):
 		directionTuple = getBestDirectionTuple(availableDirectionTuples, snakeBoard)
 	else:
-		getRandomListValue(allDirectionTuples)
+		directionTuple = getRandomListValue(allDirectionTuples)
 	print('Next move:', getDirectionFromTuple(directionTuple))
 	return getDirectionFromTuple(directionTuple)
 
@@ -34,7 +34,6 @@ def getBestDirectionTuple(availableDirectionTuples, snakeBoard):
 	return getHighestWeightedMoveCoord(availableDirectionTuples, weightList)
 
 def getBiggerHeadPerimeterWeight(nextMoveCoord, biggerHeadPerimeterCoords):
-	print('COUNT of coords', biggerHeadPerimeterCoords.count(nextMoveCoord))
 	return biggerHeadPerimeterCoords.count(nextMoveCoord) * -1
 
 def getHighestWeightedMoveCoord(availableMoveCoords, weightList):
