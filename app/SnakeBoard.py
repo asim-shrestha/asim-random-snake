@@ -7,8 +7,10 @@ class SnakeBoard:
         self.height = data['board']['height']
         self.playerSnake = Snake(data['you'])
         self.enemySnakes = self.getEnemySnakes(data['board']['snakes'])
+        self.biggerHeadPerimeterCoords = self.getBiggerHeadPerimeterCoords()
         self.foodCoords = serializeCoordsFromCoordList(data['board']['food'])
-        print(self.playerSnake.coords)
+        print('Player coords', self.playerSnake.coords)
+        print('Bigger head perimiters', self.biggerHeadPerimeterCoords)
 
     def getEnemySnakes(self, snakeData):
         enemySnakes = []
@@ -16,6 +18,29 @@ class SnakeBoard:
             if(snake['id'] != self.playerSnake.id):
                 enemySnakes.append(Snake(snake))
         return enemySnakes
+    
+    def getBiggerHeadPerimeterCoords(self):
+        biggerHeadPerimetersCoords = []
+        for snake in self.enemySnakes:
+            if(snake.length >= self.playerSnake.length):
+                biggerHeadPerimetersCoords.extend(self.getHeadPerimetersCoordsFromSnake(snake))
+        return biggerHeadPerimetersCoords
+
+    def getSmallerHeadPerimeterCoords(self):
+        smallerHeadPerimeterCoords = []
+        for snake in self.enemySnakes:
+            if(snake.length < self.playerSnake.length):
+                smallerHeadPerimeterCoords.extend(self.getHeadPerimetersCoordsFromSnake(snake))
+        return smallerHeadPerimeterCoords
+
+    def getHeadPerimetersCoordsFromSnake(self, snake):
+        headPerimeterCoords = []
+        snakeHeadCoord = snake.coords[0]
+        headPerimeterCoords.append([snakeHeadCoord[0], snakeHeadCoord[1] - 1]) # Block above the head
+        headPerimeterCoords.append([snakeHeadCoord[0], snakeHeadCoord[1] + 1]) # Block below the head
+        headPerimeterCoords.append([snakeHeadCoord[0] - 1, snakeHeadCoord[1]]) # Block to the left of head
+        headPerimeterCoords.append([snakeHeadCoord[0] + 1, snakeHeadCoord[1]]) # Block to the right of head
+        return headPerimeterCoords
 
     def isNextMoveOutOfBounds(self, nextMoveCoord):
         # Test x cord
