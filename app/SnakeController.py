@@ -2,9 +2,13 @@ import random
 from SerializationUtils import getDirectionFromTuple
 
 HEAD_PERIMETER_WEIGHT = 3
-FOOD_WEIGHT = 2
-
+GROWTH_WEIGHT = 2
 TRAPPED_WEIGHT = 10
+
+SIZE_REQUIRED_FOR_TIE_WEIGHTS = 5
+
+STARVING_HEALTH = 45
+STARVATION_LENGTH = 10
 
 def getDirectionTuples():
 	# Up. down, left, right
@@ -36,6 +40,7 @@ def getBestDirectionTuple(availableDirectionTuples, snakeBoard):
 		weightList[i] += getEqualHeadPermiterWeight(nextMoveCoord, snakeBoard)
 		weightList[i] += getBiggerHeadPerimeterWeight(nextMoveCoord, snakeBoard)
 		weightList[i] += getSmallTrapAvoidanceWeight(nextMoveCoord, snakeBoard)
+		weightList[i] += getStarvationWeight(nextMoveCoord, snakeBoard)
 		# TODO weight for 1 space trapping or free areas
 		# TODO weight for closer to food if health is low
 
@@ -48,7 +53,10 @@ def getSmallerHeadPerimeterWeight(nextMoveCoord, snakeBoard):
 
 # Check if the coordinant is in the head perimeter of a snake of equal size
 # We want to step in these spots if we are the only 2 snakes left, otherwise avoid it
+# Do not try to get a tie when you 
 def getEqualHeadPermiterWeight(nextMoveCoord, snakeBoard):
+	if snakeBoard.playerSnake.length < SIZE_REQUIRED_FOR_TIE_WEIGHTS:
+		return 0
 	if (snakeBoard.equalHeadPerimeterCoords.count(nextMoveCoord) > 0):
 		if len(snakeBoard.enemySnakes) == 1:
 			return HEAD_PERIMETER_WEIGHT
@@ -71,6 +79,16 @@ def getSmallTrapAvoidanceWeight(nextMoveCoord, snakeBoard):
 		return TRAPPED_WEIGHT * -1
 	else:
 		return 0
+
+def getStarvationWeight(nextMoveCoord, snakeBoard):
+	# Player isn't starving, no need to prioritize food
+	if snakeBoard.playerSnake.health > STARVING_HEALTH:
+		return 0
+	else:
+		starvationWeight = STARVATION_LENGTH - snakeBoard.getNumMovesToNearestFood(nextMoveCoord)
+		if starvationWeight < 0:
+			starvationWeight = 0
+		return starvationWeight
 
 def getCollisionNeighboursInBoundary(nextMoveCoord, boundary, snakeBoard):
 	collisionNeighbourCoords = []
