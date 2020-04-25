@@ -12,7 +12,7 @@ ABOVE_POTENTIAL_TURN_REQUIREMENTS_WEIGHT = 1
 SIZE_REQUIRED_FOR_TIE = 5
 # To determine if the snake should hunt for food
 LENGTH_REQUIRED_TO_STOP_HUNTING_FOOD = 8
-NUM_OF_MOVES_REQUIRED_TO_HUNT_NEAREST_FOOD = 3
+NUM_OF_MOVES_REQUIRED_TO_HUNT_NEAREST_FOOD = 4
 STARVING_HEALTH = 45
 STARVATION_LENGTH = 5
 # For BFS
@@ -91,7 +91,9 @@ def getStarvationWeight(nextMoveCoord, snakeBoard):
 
 def getNearbyFoodWeight(nextMoveCoord, snakeBoard):
 	# Check if the snake is already big enough
-	if snakeBoard.playerSnake.length > LENGTH_REQUIRED_TO_STOP_HUNTING_FOOD:
+	if len([snake for snake in snakeBoard.enemySnakes if snake.length > snakeBoard.playerSnake.length - 1]):
+		pass
+	elif snakeBoard.playerSnake.length > LENGTH_REQUIRED_TO_STOP_HUNTING_FOOD:
 		return 0
 	
 	numMovesToNearestFood = snakeBoard.getNumMovesToNearestFood(nextMoveCoord)
