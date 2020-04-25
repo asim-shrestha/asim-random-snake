@@ -91,7 +91,7 @@ def getStarvationWeight(nextMoveCoord, snakeBoard):
 
 def getNearbyFoodWeight(nextMoveCoord, snakeBoard):
 	# Check if the snake is already big enough
-	if len([snake for snake in snakeBoard.enemySnakes if snake.length > snakeBoard.playerSnake.length - 1]):
+	if len([snake for snake in snakeBoard.enemySnakes if snake.length + 1 > snakeBoard.playerSnake.length - 1]):
 		pass
 	elif snakeBoard.playerSnake.length > LENGTH_REQUIRED_TO_STOP_HUNTING_FOOD:
 		return 0
