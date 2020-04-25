@@ -3,15 +3,16 @@ from SerializationUtils import getDirectionFromTuple, getCoordPerimeterCoords
 
 # Weights for heuristics
 SMALLER_HEAD_PERIMETER_WEIGHT = 4
+TIE_HEAD_PERIMETER_WEIGHT = 1
 BIGGER_HEAD_PERIMETER_WEIGHT = 5
-GROWTH_WEIGHT = 2
 TRAPPED_WEIGHT = 10
-ABOVE_POTENTIAL_TURN_REQUIREMENTS_WEIGHT = 1
 BELOW_SNAKE_SIZE_WEIGHT = 5
-SMALLER_THAN_SIZE_REQUIRED_FOR_TIE_WEIGHT = 1
+ABOVE_POTENTIAL_TURN_REQUIREMENTS_WEIGHT = 1
 # Size required for the snake to hunt for a tie
 SIZE_REQUIRED_FOR_TIE = 5
 # To determine if the snake should hunt for food
+LENGTH_REQUIRED_TO_STOP_HUNTING_FOOD = 8
+NUM_OF_MOVES_REQUIRED_TO_HUNT_NEAREST_FOOD = 3
 STARVING_HEALTH = 45
 STARVATION_LENGTH = 5
 # For BFS
@@ -54,6 +55,7 @@ def getNextMoveCoordWeight(nextMoveCoord, snakeBoard):
 	weight += getEqualHeadPermiterWeight(nextMoveCoord, snakeBoard)
 	weight += getBiggerHeadPerimeterWeight(nextMoveCoord, snakeBoard)
 	weight += getStarvationWeight(nextMoveCoord, snakeBoard)
+	weight += getNearbyFoodWeight(nextMoveCoord, snakeBoard)
 	weight += getBFSWeight(nextMoveCoord, snakeBoard)
 	# TODO weight for 1 space trapping or free areas
 	# TODO weight for closer to food if health is low
@@ -68,9 +70,9 @@ def getSmallerHeadPerimeterWeight(nextMoveCoord, snakeBoard):
 def getEqualHeadPermiterWeight(nextMoveCoord, snakeBoard):
 	if (snakeBoard.equalHeadPerimeterCoords.count(nextMoveCoord) > 0):
 		if len(snakeBoard.enemySnakes) == 1:
-			return SMALLER_THAN_SIZE_REQUIRED_FOR_TIE_WEIGHT * -1
+			return SIZE_REQUIRED_FOR_TIE * -1
 		else:
-			return BIGGER_HEAD_PERIMETER_WEIGHT * -1
+			return SMALLER_HEAD_PERIMETER_WEIGHT * -1
 	else:
 		return 0
 
@@ -86,6 +88,17 @@ def getStarvationWeight(nextMoveCoord, snakeBoard):
 		if starvationWeight < 0:
 			starvationWeight = 0
 		return starvationWeight
+
+def getNearbyFoodWeight(nextMoveCoord, snakeBoard):
+	# Check if the snake is already big enough
+	if snakeBoard.playerSnake.length > LENGTH_REQUIRED_TO_STOP_HUNTING_FOOD:
+		return 0
+	
+	numMovesToNearestFood = snakeBoard.getNumMovesToNearestFood(nextMoveCoord)
+	print('num moves to nearest food', numMovesToNearestFood)
+	if numMovesToNearestFood <= NUM_OF_MOVES_REQUIRED_TO_HUNT_NEAREST_FOOD:
+		return NUM_OF_MOVES_REQUIRED_TO_HUNT_NEAREST_FOOD - numMovesToNearestFood
+	return 0
 
 def getCollisionNeighboursInBoundary(nextMoveCoord, boundary, snakeBoard):
 	collisionNeighbourCoords = []
