@@ -70,7 +70,7 @@ def getSmallerHeadPerimeterWeight(nextMoveCoord, snakeBoard):
 def getEqualHeadPermiterWeight(nextMoveCoord, snakeBoard):
 	if (snakeBoard.equalHeadPerimeterCoords.count(nextMoveCoord) > 0):
 		if len(snakeBoard.enemySnakes) == 1:
-			return SIZE_REQUIRED_FOR_TIE * -1
+			return TIE_HEAD_PERIMETER_WEIGHT * -1
 		else:
 			return SMALLER_HEAD_PERIMETER_WEIGHT * -1
 	else:
@@ -101,16 +101,6 @@ def getNearbyFoodWeight(nextMoveCoord, snakeBoard):
 	if numMovesToNearestFood <= NUM_OF_MOVES_REQUIRED_TO_HUNT_NEAREST_FOOD:
 		return NUM_OF_MOVES_REQUIRED_TO_HUNT_NEAREST_FOOD - numMovesToNearestFood
 	return 0
-
-def getCollisionNeighboursInBoundary(nextMoveCoord, boundary, snakeBoard):
-	collisionNeighbourCoords = []
-	for i in range(boundary * -1, boundary + 1):
-		for j in range(boundary * -1, boundary + 1):
-			neighbourCoord = [nextMoveCoord[0] + i, nextMoveCoord[1] + j]
-			if isNextMoveCoordACollision(neighbourCoord, snakeBoard):
-				collisionNeighbourCoords.append(neighbourCoord)
-	print('Debug colliding neighbours:', collisionNeighbourCoords)
-	return collisionNeighbourCoords
 
 def getHighestWeightedMoveCoord(availableMoveCoords, weightList):
 	# Get the index with the highest weight
