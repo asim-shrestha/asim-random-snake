@@ -8,6 +8,7 @@ from SnakeBoard import SnakeBoard
 import SnakeController
 from api import ping_response, start_response, move_response, end_response
 
+count = 0
 
 @bottle.route('/')
 def index():
@@ -57,6 +58,8 @@ def getRandomColour():
 
 @bottle.post('/move')
 def move():
+    global count
+    count += 1 
     # Retrieve data
     data = json.load(bottle.request.body)
     # print('DEBUG DUMP', data)
