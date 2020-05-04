@@ -59,7 +59,8 @@ def getRandomColour():
 @bottle.post('/move')
 def move():
     global count
-    count += 1 
+    count += 1
+    print('COUNT:', count)
     # Retrieve data
     data = json.load(bottle.request.body)
     # print('DEBUG DUMP', data)
